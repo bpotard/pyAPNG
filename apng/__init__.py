@@ -469,13 +469,13 @@ class APNG:
 					control = FrameControl.from_bytes(data[12:-4])
 			elif type_ == "IDAT":
 				if new_frame:
-				    frame_chunks.extend(head_chunks)
+					frame_chunks.extend(head_chunks)
 					new_frame = False
 				frame_chunks.append((type_, data))
 			elif type_ == "fdAT":
 				# convert to IDAT
 				if new_frame:
-				    frame_chunks.extend(head_chunks)
+					frame_chunks.extend(head_chunks)
 					new_frame = False
 				frame_chunks.append(("IDAT", make_chunk("IDAT", data[12:-4])))
 			elif type_ == "IEND":
