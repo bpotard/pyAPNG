@@ -443,7 +443,7 @@ class APNG:
 		frame_chunks = []
 		frames = []
 		num_plays = 0
-		new_frame = True
+		frame_has_head_chunks = False
 		
 		control = None
 		
@@ -459,7 +459,7 @@ class APNG:
 					# IDAT inside chunk, go to next frame
 					frame_chunks.append(end)
 					frames.append((PNG.from_chunks(frame_chunks), control))
-					new_frame = True
+					frame_has_head_chunks = False
 					control = FrameControl.from_bytes(data[12:-4])
 					# https://github.com/PyCQA/pylint/issues/2072
 					# pylint: disable=typecheck
@@ -468,15 +468,15 @@ class APNG:
 				else:
 					control = FrameControl.from_bytes(data[12:-4])
 			elif type_ == "IDAT":
-				if new_frame:
+				if not frame_has_head_chunks:
 					frame_chunks.extend(head_chunks)
-					new_frame = False
+					frame_has_head_chunks = True
 				frame_chunks.append((type_, data))
 			elif type_ == "fdAT":
 				# convert to IDAT
-				if new_frame:
+				if not frame_has_head_chunks:
 					frame_chunks.extend(head_chunks)
-					new_frame = False
+					frame_has_head_chunks = True
 				frame_chunks.append(("IDAT", make_chunk("IDAT", data[12:-4])))
 			elif type_ == "IEND":
 				# end
